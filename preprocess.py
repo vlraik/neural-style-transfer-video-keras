@@ -1,4 +1,11 @@
 import os
+import argparse
+from scipy.misc import imread, imresize, imsave
+# dimensions of the generated picture.
+img_width = 280
+img_height = 280
+assert img_height == img_width, 'Due to the use of the Gram matrix, width and height must match.'
+
 parser = argparse.ArgumentParser(description='Neural style transfer with Keras.')
 parser.add_argument('base_image_path', metavar='base', type=str,
                     help='Path to the image to transform.')

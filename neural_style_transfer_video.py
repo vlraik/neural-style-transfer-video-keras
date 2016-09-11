@@ -39,7 +39,7 @@ from keras import backend as K
 parser = argparse.ArgumentParser(description='Neural style transfer with Keras.')
 parser.add_argument('base_image_path', metavar='base', type=str,
                     help='Path to the image to transform.')
-parser.add_argument('directory', metavar='base', type=str,
+parser.add_argument('directory', metavar='directory', type=str,
                     help='directory to the image to transform')
 parser.add_argument('style_reference_image_path', metavar='ref', type=str,
                     help='Path to the style reference image.')
@@ -92,7 +92,7 @@ for file in os.listdir(directory):
         fname = directory+'/'+file + '.png'
         imsave(fname, img)
 '''
-first_layer = ZeroPadding2D((1, 1), input_shape=(3, img_width, img_height))
+#first_layer = ZeroPadding2D((1, 1), input_shape=(3, img_width, img_height))
 
 
 
@@ -173,6 +173,7 @@ class Evaluator(object):
 evaluator = Evaluator()
 
 style_reference_image = K.variable(preprocess_image(style_reference_image_path))
+print(style_reference_image.shape)
 
 
 for file in os.listdir(directory):
@@ -181,6 +182,7 @@ for file in os.listdir(directory):
 
         # get tensor representations of our images
         base_image = K.variable(preprocess_image(directory+'/'+file))
+        print(base_image)
     
 
         # this will contain our generated image
@@ -191,9 +193,10 @@ for file in os.listdir(directory):
                                   style_reference_image,
                                   combination_image], axis=0)
 
+        first_layer = ZeroPadding2D((1, 1), input_shape=(3, img_width, img_height))
         first_layer.input = input_tensor
         model = Sequential()
-        model.add(first_layer)
+        model.add(input_tensor)
         model.add(Convolution2D(64, 3, 3, activation='relu', name='conv1_1'))
         model.add(ZeroPadding2D((1, 1)))
         model.add(Convolution2D(64, 3, 3, activation='relu'))
@@ -281,9 +284,9 @@ for file in os.listdir(directory):
         for i in range(1):
             print('Start of iteration', i)
             start_time = time.time()
-            for j in range(30):
+            for j in range(1):
                     x, min_val, info = fmin_l_bfgs_b(evaluator.loss, x.flatten(),
-                                         fprime=evaluator.grads, maxfun=20)
+                                         fprime=evaluator.grads, maxfun=1000)
 
             print('Current loss value:', min_val)
             # save current generated image
